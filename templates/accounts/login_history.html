@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login History</title>
+</head>
+<body>
+    <h1>Your Login History</h1>
+    
+    <table border="1">
+        <tr>
+            <th>Date/Time</th>
+            <th>IP Address</th>
+            <th>User Agent</th>
+            <th>Status</th>
+        </tr>
+        {% for entry in history %}
+        <tr>
+            <td>{{ entry.timestamp }}</td>
+            <td>{{ entry.ip_address }}</td>
+            <td>{{ entry.user_agent }}</td>
+            <td>{{ entry.status }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">No login history available</td>
+        </tr>
+        {% endfor %}
+    </table>
+    
+    <a href="/">Back to Home</a>
+</body>
+</html>

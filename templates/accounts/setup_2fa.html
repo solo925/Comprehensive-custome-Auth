@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Setup Two-Factor Authentication</title>
+</head>
+<body>
+    <h1>Setup Two-Factor Authentication</h1>
+    
+    <p>Scan this QR code with your authenticator app:</p>
+    <div>
+        <img src="data:image/svg+xml;base64,{{ qr_code }}" alt="QR Code">
+    </div>
+    
+    <p>Or enter this key manually: {{ device.key }}</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        <p>Enter the 6-digit code from your authenticator app:</p>
+        <input type="text" name="token" required>
+        <button type="submit">Verify</button>
+    </form>
+    
+    <a href="{% url 'accounts:profile' %}">Cancel</a>
+</body>
+</html>

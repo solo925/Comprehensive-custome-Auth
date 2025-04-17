@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+</head>
+<body>
+    <h1>Welcome {{ user.username }}!</h1>
+    <p>Your email: {{ user.email }}</p>
+    <p>Email verified: {{ user.email_verified }}</p>
+    
+    <nav>
+        <ul>
+            <li><a href="{% url 'accounts:profile' %}">Profile</a></li>
+            <li><a href="{% url 'accounts:login_history' %}">Login History</a></li>
+            <li><a href="{% url 'account_logout' %}">Logout</a></li>
+        </ul>
+    </nav>
+</body>
+</html>
