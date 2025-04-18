@@ -41,7 +41,7 @@ collected_static/
 
 # Environment vars
 .env
-.env.*
+
 *.env
 
 # IDEs/Editors

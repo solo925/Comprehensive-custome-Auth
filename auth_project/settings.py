@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,17 +23,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-$d0dah7n@(wsn&ahp+%i0z1dkd*alc8yii+p#e8ld$i8e1b9!#'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = []
 
 
 # Application definition
-
-# Add the following to your INSTALLED_APPS
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -40,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     
-    # Third-part
+   
     'rest_framework',
     'rest_framework.authtoken',
     'allauth',
@@ -57,7 +58,7 @@ INSTALLED_APPS = [
     'geoip2',
     'captcha',
     
-    # Local
+   
     'accounts',
 ]
 
@@ -102,13 +103,15 @@ WSGI_APPLICATION = 'auth_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+from django.db import connections
+import dj_database_url
 
+DATABASES = {
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL', 'sqlite:///db.sqlite3'),
+        conn_max_age=600
+    )
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -147,7 +150,7 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
+
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
@@ -167,6 +170,15 @@ AUTHENTICATION_BACKENDS = [
     'axes.backends.AxesBackend',
 ]
 
+
+#form customization for django-allauth
+ACCOUNT_FORMS = {
+    'login': 'accounts.forms.CaptchaAuthenticationForm',
+    'signup': 'accounts.forms.CaptchaRegistrationForm',
+    'reset_password': 'accounts.forms.CaptchaPasswordResetForm',
+    'reset_password_from_key': 'accounts.forms.CaptchaSetPasswordForm',
+}
+
 # Django-allauth configuration
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
@@ -176,10 +188,10 @@ ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_UNIQUE_EMAIL = True
 SOCIALACCOUNT_AUTO_SIGNUP = False 
 
-# Site ID (required for django-allauth)
+# Site ID
 SITE_ID = 1
 
-# REST Framework settings
+# REST
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -190,33 +202,32 @@ REST_FRAMEWORK = {
     ],
 }
 
-# Django Axes settings (for login throttling)
+# AAxes
 AXES_FAILURE_LIMIT = 5 
 AXES_COOLOFF_TIME = 1  
 AXES_RESET_ON_SUCCESS = True  
 
 
-# JWT settings
+# JWT
 from datetime import timedelta
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=int(os.getenv('JWT_ACCESS_TOKEN_LIFETIME_MINUTES', 30))),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=int(os.getenv('JWT_REFRESH_TOKEN_LIFETIME_DAYS', 1))),
     'ROTATE_REFRESH_TOKENS': True,
+    'SIGNING_KEY': os.getenv('JWT_SECRET_KEY', SECRET_KEY),
 }
 
-# Email settings (for development)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# For production, use SMTP:
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.example.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'your_email@example.com'
-# EMAIL_HOST_PASSWORD = 'your_password'
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+if EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend':
+    EMAIL_HOST = os.getenv('EMAIL_HOST')
+    EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+    EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
 
-# Configure GeoIP2
+#GeoIP2
 GEOIP_PATH = os.path.join(BASE_DIR, 'geoip2')
 GEOIP_COUNTRY = 'GeoLite2-Country.mmdb'
 GEOIP_CITY = 'GeoLite2-City.mmdb'
@@ -224,17 +235,17 @@ GEOIP_CITY = 'GeoLite2-City.mmdb'
 # Allowed countries (ISO codes)
 # ALLOWED_COUNTRIES = ['US', 'CA', 'GB'] 
 
-# reCAPTCHA settings
-RECAPTCHA_PUBLIC_KEY = 'your-recaptcha-public-key'
-RECAPTCHA_PRIVATE_KEY = 'your-recaptcha-private-key'
+# reCAPTCHA
+RECAPTCHA_PUBLIC_KEY = os.getenv('RECAPTCHA_PUBLIC_KEY', '')
+RECAPTCHA_PRIVATE_KEY = os.getenv('RECAPTCHA_PRIVATE_KEY', '')
 RECAPTCHA_REQUIRED_SCORE = 0.85 
 
-# Google OAuth2 settings
+# Google OAuth2
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
-            'client_id': 'YOUR_GOOGLE_CLIENT_ID',
-            'secret': 'YOUR_GOOGLE_CLIENT_SECRET',
+            'client_id': os.getenv('GOOGLE_CLIENT_ID'),
+            'secret': os.getenv('GOOGLE_CLIENT_SECRET'),
             'key': ''
         },
         'SCOPE': [
@@ -247,8 +258,8 @@ SOCIALACCOUNT_PROVIDERS = {
     },
     'github': {
         'APP': {
-            'client_id': 'YOUR_GITHUB_CLIENT_ID',
-            'secret': 'YOUR_GITHUB_SECRET',
+            'client_id': os.getenv('GITHUB_CLIENT_ID'),
+            'secret': os.getenv('GITHUB_CLIENT_SECRET'),
             'key': ''
         },
         'SCOPE': [
@@ -258,8 +269,8 @@ SOCIALACCOUNT_PROVIDERS = {
     },
     'linkedin_oauth2': {
         'APP': {
-            'client_id': 'YOUR_LINKEDIN_CLIENT_ID',
-            'secret': 'YOUR_LINKEDIN_SECRET',
+            'client_id': os.getenv('LINKEDIN_CLIENT_ID'),
+            'secret': os.getenv('LINKEDIN_CLIENT_SECRET'),
             'key': ''
         },
         'SCOPE': [

@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block head_title %}{% trans "Sign Up" %}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h1 class="text-center">{% trans "Sign Up" %}</h1>
+        </div>
+        <div class="card-body">
+          {% get_providers as socialaccount_providers %}
+          
+          {% if socialaccount_providers %}
+          <div class="social-login mb-4">
+            <p class="text-center">{% trans "Sign up with:" %}</p>
+            <div class="d-flex justify-content-center">
+              {% for provider in socialaccount_providers %}
+                <a href="{% provider_login_url provider.id process='login' %}" 
+                   class="btn btn-outline-secondary mx-2">
+                  <i class="fab fa-{{ provider.id }}"></i> {{ provider.name }}
+                </a>
+              {% endfor %}
+            </div>
+            <hr>
+            <p class="text-center">{% trans "or create an account:" %}</p>
+          </div>
+          {% endif %}
+          
+          <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+            <div class="alert alert-danger">
+              {% for field in form %}
+                {% for error in field.errors %}
+                  <p>{{ field.label }}: {{ error }}</p>
+                {% endfor %}
+              {% endfor %}
+              
+              {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+            {% endif %}
+            
+            <div class="form-group mb-3">
+              <label for="id_username">{% trans "Username" %}:</label>
+              <input type="text" name="username" placeholder="{% trans 'Username' %}" 
+                     class="form-control" id="id_username" required>
+            </div>
+            
+            <div class="form-group mb-3">
+              <label for="id_email">{% trans "Email" %}:</label>
+              <input type="email" name="email" placeholder="{% trans 'Email address' %}" 
+                     class="form-control" id="id_email" required>
+            </div>
+            
+            <div class="form-group mb-3">
+              <label for="id_password1">{% trans "Password" %}:</label>
+              <input type="password" name="password1" placeholder="{% trans 'Password' %}" 
+                     class="form-control" id="id_password1" required>
+              <small class="form-text text-muted">
+                {% trans "Password must be at least 12 characters long and contain letters, numbers, and special characters." %}
+              </small>
+            </div>
+            
+            <div class="form-group mb-3">
+              <label for="id_password2">{% trans "Confirm Password" %}:</label>
+              <input type="password" name="password2" placeholder="{% trans 'Confirm Password' %}" 
+                     class="form-control" id="id_password2" required>
+            </div>
+            
+            {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+            {% endif %}
+            
+            {% if captcha_form %}
+            <div class="form-group mb-3">
+              {{ captcha_form.captcha }}
+            </div>
+            {% endif %}
+            
+            <div class="form-check mb-3">
+              <input type="checkbox" name="terms" class="form-check-input" id="id_terms" required>
+              <label class="form-check-label" for="id_terms">
+                {% trans "I agree to the Terms and Conditions" %}
+              </label>
+            </div>
+            
+            <div class="d-grid gap-2">
+              <button class="btn btn-primary" type="submit">{% trans "Sign Up" %}</button>
+            </div>
+          </form>
+          
+          <div class="mt-4 text-center">
+            <p>{% trans "Already have an account?" %} 
+              <a href="{% url 'account_login' %}">{% trans "Sign In" %}</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
