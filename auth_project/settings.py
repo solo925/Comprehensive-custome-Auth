@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -52,6 +52,10 @@ INSTALLED_APPS = [
     'axes',
     'django_otp',
     'django_otp.plugins.otp_totp',
+    'allauth.socialaccount.providers.github',
+    'allauth.socialaccount.providers.linkedin_oauth2',
+    'geoip2',
+    'captcha',
     
     # Local
     'accounts',
@@ -66,6 +70,13 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
+    'accounts.session.SessionTimeoutMiddleware',
+    'accounts.middleware.RoleMiddleware',
+    'accounts.middleware.RoleMiddleware',
+    'accounts.security.SecurityHeadersMiddleware',
+    'accounts.geo.GeoIPMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'auth_project.urls'
@@ -108,12 +119,18 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS':{
+             'min_length': 12,
+        }
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+    {
+        'NAME': 'accounts.validators.PasswordComplexityValidator',
     },
 ]
 
@@ -199,6 +216,19 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # EMAIL_HOST_PASSWORD = 'your_password'
 
 
+# Configure GeoIP2
+GEOIP_PATH = os.path.join(BASE_DIR, 'geoip2')
+GEOIP_COUNTRY = 'GeoLite2-Country.mmdb'
+GEOIP_CITY = 'GeoLite2-City.mmdb'
+
+# Allowed countries (ISO codes)
+# ALLOWED_COUNTRIES = ['US', 'CA', 'GB'] 
+
+# reCAPTCHA settings
+RECAPTCHA_PUBLIC_KEY = 'your-recaptcha-public-key'
+RECAPTCHA_PRIVATE_KEY = 'your-recaptcha-private-key'
+RECAPTCHA_REQUIRED_SCORE = 0.85 
+
 # Google OAuth2 settings
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -214,5 +244,40 @@ SOCIALACCOUNT_PROVIDERS = {
         'AUTH_PARAMS': {
             'access_type': 'online',
         }
+    },
+    'github': {
+        'APP': {
+            'client_id': 'YOUR_GITHUB_CLIENT_ID',
+            'secret': 'YOUR_GITHUB_SECRET',
+            'key': ''
+        },
+        'SCOPE': [
+            'user',
+            'user:email',
+        ],
+    },
+    'linkedin_oauth2': {
+        'APP': {
+            'client_id': 'YOUR_LINKEDIN_CLIENT_ID',
+            'secret': 'YOUR_LINKEDIN_SECRET',
+            'key': ''
+        },
+        'SCOPE': [
+            'r_liteprofile',
+            'r_emailaddress',
+        ],
+        'PROFILE_FIELDS': [
+            'id',
+            'first-name',
+            'last-name',
+            'email-address',
+            'picture-url',
+        ],
     }
 }
+
+
+# Session settings
+SESSION_COOKIE_AGE = 1800
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True

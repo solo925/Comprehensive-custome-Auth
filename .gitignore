@@ -1,2 +1,104 @@
-venv
-.venv
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pdb
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environment
+env/
+venv/
+ENV/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Django stuff
+*.log
+*.pot
+*.pyc
+db.sqlite3
+db.sqlite3-journal
+
+# Postgres
+*.pgsql
+*.psql
+*.sql
+
+# Media/Static
+/media
+/mediafiles
+/static
+/staticfiles
+/assets
+collected_static/
+
+# Environment vars
+.env
+.env.*
+*.env
+
+# IDEs/Editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Operating System
+.DS_Store
+Thumbs.db
+
+# Coverage/Testing
+.coverage
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+coverage.xml
+*.cover
+
+# Migrations (optional to ignore, sometimes included)
+**/migrations/__pycache__/
+**/migrations/*.py[cod]
+# Uncomment below if you want to exclude migration files
+# **/migrations/*.py
+
+# DevOps, Docker, etc.
+docker-compose.override.yml
+*.pid
+*.seed
+celerybeat-schedule
+*.db
+*.rdb
+*.sock
+
+# MyPy / Pyright / Pylint
+.mypy_cache/
+.pyright/
+.pylint.d/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# VSCode Python interpreter paths
+.python-version
+
+# Gunicorn
+gunicorn.sock
+
+# Backup files
+*.bak
+*.swp
+*~
+
+# PostgreSQL init
+postgres/init.sql

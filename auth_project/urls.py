@@ -19,6 +19,9 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
+from accounts.forms import CaptchaAuthenticationForm
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -34,6 +37,11 @@ urlpatterns = [
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     
     path('accounts/', include('accounts.urls')),
+    
+    path('accounts/login/', auth_views.LoginView.as_view(
+        form_class=CaptchaAuthenticationForm,
+        template_name='account/login.html'
+    ), name='account_login'),
     
     path('', login_required(TemplateView.as_view(template_name='home.html')), name='home'),
 ]
